@@ -75,4 +75,18 @@ router.get("/:id/like", async (req, res) => {
     return res.status(500).json(err.message);
   }
 });
+
+//get api by id
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    return res.status(200).json({
+      message: "success get post by id",
+      data: post,
+    });
+  } catch (err) {
+    return res.status(500).json(err.message);
+  }
+});
 module.exports = router;
