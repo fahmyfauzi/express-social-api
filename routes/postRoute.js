@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const Post = require("../models/postModel");
+const User = require("../models/userModel");
 
 router.post("/", async (req, res) => {
   const newPost = new Post(req.body);
@@ -85,6 +86,27 @@ router.get("/:id", async (req, res) => {
       message: "success get post by id",
       data: post,
     });
+  } catch (err) {
+    return res.status(500).json(err.message);
+  }
+});
+
+router.get("/timeline/:userId", async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.params.userId);
+
+    // mencari postingan yang diposting oleh pengguna
+    const userPost = await Post.find({ userId: currentUser._id });
+
+    //mencari postingan dari teman-teman yang diikuti oleh pengguna saat ini
+    const friendPost = await Promise.all(
+      //Promise.all() digunakan untuk menjalankan beberapa permintaan pencarian Post secara paralel untuk setiap teman yang diikuti.
+      currentUser.followings.map((friendId) => {
+        return Post.find({ userId: friendId });
+      })
+    );
+    //ketemu : kodenya menggabungkan hasilnya menggunakan metode concat()
+    return res.status(200).json(userPost.concat(...friendPost));
   } catch (err) {
     return res.status(500).json(err.message);
   }
