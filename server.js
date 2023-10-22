@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const authRoute = require("./routes/authRoute");
 const postRoute = require("./routes/postRoute");
+const userRoute = require("./routes/userRoute");
 
 const app = express();
 dotenv.config();
@@ -19,6 +20,8 @@ app.use("/api/users", authRoute);
 
 //middleware route post
 app.use("/api/posts", postRoute);
+
+app.use("/api/user", userRoute);
 
 //connect mongodb
 mongoose
