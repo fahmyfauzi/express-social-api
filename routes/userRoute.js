@@ -8,7 +8,7 @@ router.get("/friends/:userId", async (req, res) => {
     //mencari teman-teman yang diikuti oleh pengguna. user.followings adalah array yang berisi ID teman-teman yang diikuti oleh pengguna
     const friends = await Promise.all(
       user.followings.map((fri_id) => {
-        return user.findById(fri_id);
+        return User.findById(fri_id);
       })
     );
 
@@ -20,7 +20,29 @@ router.get("/friends/:userId", async (req, res) => {
     });
     return res.status(200).json(friendList);
   } catch (err) {
-    return res.status(500).json(error);
+    return res.status(500).json(err.message);
+  }
+});
+
+//follow user
+router.put("/:id/follow", async (req, res) => {
+  console.log(req.body._id, req.params.id);
+  if (req.body.userId != req.params.id) {
+    try {
+      const user = await User.findById(req.params.id);
+      const currentUser = await User.findById(req.body.userId);
+      if (!user.followers.includes(req.body.userId)) {
+        await user.updateOne({ $push: { followers: req.body.userId } });
+        await currentUser.updateOne({ $push: { followings: req.params.id } });
+        return res.status(200).json("User has been followed");
+      } else {
+        return res.status(403).json("you already followed user");
+      }
+    } catch (err) {
+      return res.status(500).json(err.message);
+    }
+  } else {
+    return res.status(403).json("you can't follow yourself");
   }
 });
 
