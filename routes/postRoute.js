@@ -111,4 +111,22 @@ router.get("/timeline/:userId", async (req, res) => {
     return res.status(500).json(err.message);
   }
 });
+
+router.get("/profile/:username", async (req, res) => {
+  try {
+    //cari username
+    const user = await User.findOne({ username: req.params.username });
+
+    //cari posts berdasarkan username
+    const post = await Post.find({ userId: user._id });
+
+    //kembalikan jika sukses
+    return res.status(200).json({
+      message: "success get profile by username",
+      data: post,
+    });
+  } catch (err) {
+    return res.status(500).json(err.message);
+  }
+});
 module.exports = router;
